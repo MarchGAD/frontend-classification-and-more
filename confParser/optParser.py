@@ -16,7 +16,7 @@ def getoptimizer(optparams, model):
             filter(lambda p: p.requires_grad, model.parameters()),
             lr=optparams['lr'],
             weight_decay=optparams['weight_decay'],
-            eps=optparams['eps']
+            eps=optparams.get('eps', 0.001)
         )
     else:
         return optimizerMapper[optparams['type']](

@@ -17,7 +17,7 @@ def build(exp_path, proj_name, main_path):
 
 def create_exp(proj_path, main_path):
     code_dirs = ['confParser', 'dataDealer', 'loss', 'model', 'pipeline', 'utils']
-    os.mkdir(proj_path)
+    os.makedirs(proj_path)
     model_path = os.path.join(proj_path, 'nnet')
     os.mkdir(model_path)
     create_log(os.path.join(proj_path, 'log'))

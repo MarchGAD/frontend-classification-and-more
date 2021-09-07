@@ -5,6 +5,7 @@ from dataDealer.kaldi_reader import KaldiReader
 import torch.utils.data as Data
 import logging
 import re
+from simp import *
 
 note = {
     'random': 'totally random, without concering labels(spks)'
@@ -22,12 +23,13 @@ class KaldiSet(Data.Dataset):
                                   group=group,
                                   pre_load=pre_load)
         self.strategy = strategy
-        self.uttshapes = []
-        if self.reader.scpX:
-            for utt in self.reader.utts:
-                shapes = re.match(r'.*?_shape_(.*)', utt).group(1)
-                tmp_shape = [int(i) for i in shapes.split('_')]
-                self.uttshapes.append(tuple(tmp_shape))
+        self.utt2num = {}
+        utt2num_path = pathjoin(dirname(scp_path), 'utt2num_frames')
+        if 'train' in scp_path and pathexist(utt2num_path):
+            with open(utt2num_path) as fin:
+                for line in fin:
+                    utt, num = line.strip().split()
+                    self.utt2num[utt] = int(num)
 
         self.len_mapper = {
             'random': len(self.reader.utts),
@@ -39,21 +41,23 @@ class KaldiSet(Data.Dataset):
 
         }
 
+        self.trim_short_utt(400)
+
     def random_getter(self, item):
         utt = self.reader.utts[item]
         spk = self.reader.utt2spk[utt]
         return self.reader.get_xvec(item), self.reader.spk2label[spk]
 
     def trim_short_utt(self, length):
-        assert self.reader.scpX
         death_list = []
         logging.info('Trimming utts less than {}.'.format(length))
-        for i, shape in enumerate(self.uttshapes):
-            if shape[0] < length:
+        for utt in self.utt2num:
+            if self.utt2num[utt] < length:
                 death_list.append(i)
+        logging.info('kill {} utts from {}'.format(len(death_list), len(self.reader.utts)))
         for ind in death_list.__reversed__():
             utt = self.reader.utts.pop(ind)
-            shape = self.uttshapes.pop(ind)
+            shape = self.utt2num.pop(ind)
         self.reader.__generate_dics__()
 
 

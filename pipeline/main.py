@@ -6,8 +6,6 @@ import torch
 import shutil
 import logging
 import time
-import sys
-sys.path.append('../.')
 import torch.utils.data as Data
 from argparse import ArgumentParser
 from confParser.mainParser import MainParser
@@ -47,14 +45,14 @@ def main():
     parser.add_argument('config_path', type=str, default='../confs/tdnn.ini')
     parser.add_argument('-c', '--cards', type=int, nargs='+', default=[0])
     parser.add_argument('-ep', '--exp_path', type=str, default='exp')
-
+    parser.add_argument('--multi-gpu', action='store_true')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = main()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.cards).strip('[]')
-    mainP = MainParser(args.config_path, exp_path=args.exp_path, main_path='../.')
+    mainP = MainParser(args.config_path, exp_path=args.exp_path, main_path='.')
     params = mainP.configs
     model_path, recorder = mainP.model_path, mainP.recorder
     shutil.copyfile(__file__, os.path.join(model_path, 'train.py'))

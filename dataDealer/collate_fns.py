@@ -36,16 +36,14 @@ class ParameterCollate:
         self.min_len = 200
         self.max_len = 400
         self.len = 400
-        self.time_axis = 2
-
 
     def fix_crop(self, batch_data):
         datalist = []
         labellist = []
         for data, label in batch_data:
-            idx = random.randint(0, data.size(self.time_axis) - self.len)
-            datalist.append(data[:, :, idx:idx + self.len])
-            labellist.append(labellist)
+            idx = random.randint(0, data.size(1) - self.len)
+            datalist.append(data[:, idx:idx + self.len])
+            labellist.append(label)
         return torch.stack(datalist), torch.LongTensor(labellist)
 
 

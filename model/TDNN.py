@@ -1,6 +1,7 @@
 # @Time : 2021/4/4 10:34
 # @Author : Yangcheng Wu
 # @FileName: TDNN.py
+import torch
 import torch.nn as nn
 from model.basic_model import BasicModel, nonlinearMapper
 from utils.align import alignwithzeros
